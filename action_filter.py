@@ -25,7 +25,7 @@ def is_square_blocked(row, col, features, direction):
         return True
     # is there a bomb and the agent can't kick or is there a bomb and the space behind it (according to direction) blocked?
     # if there are 2 bombs after each other, this breaks, since you can't push two bombs at the same time
-    if features[0, row, col, 9] > 0 and (features[0, row, col, 30] == 0 or is_square_blocked(row, col, features, direction)):
+    if features[0, row, col, 12] > 0 and (features[0, row, col, 32] == 0 or is_square_blocked(row, col, features, direction)):
         return True
     return False
 
@@ -48,8 +48,9 @@ def get_action_filter(row, col, features):
     a2 = is_square_safe(row, col, features, (+1, 0))
     a3 = is_square_safe(row, col, features, (0, -1))
     a4 = is_square_safe(row, col, features, (0, +1))
-    a5 = 0 if features[0, row, col, 9] > 0 else 1
+    a5 = 0 if features[0, row, col, 12] > 0 else 1
     # stop, up, down, left, right, place_bomb
+#     print(a0, a1, a2, a3, a4, a5)
     return [a0, a1, a2, a3, a4, a5]
 
 
@@ -68,31 +69,30 @@ def is_square_safe(row_, col_, features, direction):
     if features[0, row, col, 0] == 1 or features[0, row, col, 1] == 1:
         return 0
     # will there be a flame next timestep? (from a previous flame)
-    if features[0, row, col, 12] == 1:
+    if features[0, row, col, 15] == 1:
         return 0
     # is there a bomb that explodes next timestep?
-    if features[0, row, col, 9] > 0.8:
+    if features[0, row, col, 12] > 0.8:
         return 0
     # is there a bomb under the agent, that explodes in t + 2?
     # doesnt't take into account chaining explosions!!
-    if features[0, row, col, 9] > 0.7 and features[0, row, col, 7] == 1:
+    if features[0, row, col, 12] > 0.7 and features[0, row, col, 5] == 1:
         return 0
 
     # is there a bomb and how safe is the space behind it?
     # (cat it be moved, is there a possibility that there will be flames next timestep etc.)
-    if features[0, row, col, 9] > 0:
+    if features[0, row, col, 12] > 0:
         # the agent is standing on top of the bomb (it is safe to stay there)
-        if features[0, row, col, 7] == 1:
+        if features[0, row, col, 5] == 1:
             return 1
         # if the agent can't kick -> not safe (can't go there)
-        if features[0, row, col, 30] == 0:
+        if features[0, row, col, 32] == 0:
             return 0
         # if the agent is standing to the side of the bomb, can he push it? (is the square behind it safe?)
         # if there are 2 bombs after each other, this breaks, since you can't push two bombs at the same time
         return is_square_safe(row, col, features, direction)
 
     # is square a trap?
-    if features[0, row_, col_, 9] > 0 and features[0, row_, col_, 7] == 1 and is_square_a_trap(row, col, features):
+    if features[0, row_, col_, 12] > 0 and features[0, row_, col_, 5] == 1 and is_square_a_trap(row, col, features):
         return 0
-
     return 1

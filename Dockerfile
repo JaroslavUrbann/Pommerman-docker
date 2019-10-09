@@ -2,8 +2,7 @@ FROM python:3.6
 
 ADD . /pommerman-docker
 
-
-RUN pip3 install --no-cache-dir requirements.txt
+RUN pip3 install --no-cache-dir -r pommerman-docker/requirements.txt
 
 EXPOSE 10080
 
