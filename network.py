@@ -6,7 +6,8 @@ import action_filter as AF
 class Network:
 
     def __init__(self, file):
-        self.model = tf.keras.models.load_model(file)
+        self.model = tf.keras.models.load_model(file, compile=False)
+        self.model._make_predict_function()
 
     def predict(self, features, position):
         actions, message = self.model.predict(features)
